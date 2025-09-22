@@ -60,9 +60,16 @@ Turtle 项目旨在实现经典的海龟交易法（Turtle Trading System），�
 - 实时应用：集成实时数据源，生成交易信号。
 
 ## 使用说明
-- 安装依赖：`pip install -r requirements.txt` 或 `poetry install`。
-- 运行示例：`python main.py --asset bond --mode backtest`。
-- 配置：AKShare无需特殊API密钥，但确保安装正确。
+- **安装依赖**：使用 `pip install -r requirements.txt` 或 `poetry install` 安装所需库，包括 akshare、pandas、numpy、pandas-ta 等。
+- **配置**：AKShare无需特殊API密钥，但确保网络连接正常。
+- **运行项目**：
+  - **获取所有可转债列表**：在代码中实例化 BondData 并调用 get_all_bonds()。
+  - **获取单个资产数据**：使用 BondData 的 fetch_bond_data(symbol) 方法。
+  - **运行策略**：实例化 TurtleStrategy，调用 compute_indicators(data) 和 generate_signals(df, equity)。
+  - **示例命令**：`python main.py --asset bond --symbol 113001 --mode backtest --equity 10000` （回测模式）。
+  - **实时监控**：`python main.py --asset bond --symbol 113001 --mode live` （生成实时信号）。
+
+详细示例见 main.py 中的实现。
 
 ## 未来计划
 - 添加实时交易接口。
