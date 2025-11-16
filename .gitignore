@@ -1,2 +1,7 @@
 
-demo/bond/__pycache__/
+__pycache__/
+*.pyc
+data/cache/
+logs/
+backups/
+.trae/
