@@ -1,3 +1,8 @@
+"""可转债数据处理
+
+基于 AKShare 获取与处理沪深可转债相关数据，提供列表与单券历史行情拉取，并支持本地 CSV 缓存。
+"""
+
 import akshare as ak
 import pandas as pd
 from pathlib import Path
@@ -5,12 +10,16 @@ import os
 from datetime import datetime, timedelta
 
 class BondData:
-    """可转债数据处理类，使用AKShare获取和处理数据"""
+    """可转债数据处理类
+
+    使用 AKShare 接口获取可转债列表与历史行情，并提供 CSV 持久化选项。
+    """
 
     def __init__(self, data_dir: str = None):
-        """
-        初始化
-        :param data_dir: 数据存储目录
+        """初始化
+
+        参数
+        - data_dir: 数据存储根目录（默认 `data/bond/`）
         """
         if data_dir is None:
             data_dir = Path(__file__).parent.parent.parent / 'data' / 'bond'
@@ -18,10 +27,13 @@ class BondData:
         self.data_dir.mkdir(parents=True, exist_ok=True)
 
     def get_all_bonds(self, save_path: str = None) -> pd.DataFrame:
-        """
-        获取所有可转债列表
-        :param save_path: 保存路径
-        :return: DataFrame with bond data
+        """获取所有可转债列表
+
+        参数
+        - save_path: 可选 CSV 保存路径
+
+        返回
+        - DataFrame：基础信息字段包含 `bond_id, bond_name, listing_date, issue_size, credit_rating`
         """
         try:
             bond_df = ak.bond_zh_cov()
@@ -47,13 +59,16 @@ class BondData:
             return pd.DataFrame()
 
     def fetch_bond_data(self, symbol: str, start_date: str = None, end_date: str = None, save_csv: bool = True) -> pd.DataFrame:
-        """
-        获取单个可转债的历史数据
-        :param symbol: 债券代码
-        :param start_date: 开始日期
-        :param end_date: 结束日期
-        :param save_csv: 是否保存到CSV
-        :return: DataFrame with OHLC data
+        """获取单券历史行情（日频）
+
+        参数
+        - symbol: 债券代码（11* 为上交所，12* 为深交所）
+        - start_date: 起始日期（YYYY-MM-DD，默认近 180 天）
+        - end_date: 结束日期（YYYY-MM-DD，默认当天）
+        - save_csv: 是否保存到 CSV（`data/bond/csv/`）
+
+        返回
+        - DataFrame：按日期索引的 OHLC 数据
         """
         if start_date is None:
             start_date = (datetime.now() - timedelta(days=180)).strftime('%Y-%m-%d')

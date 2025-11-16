@@ -1,9 +1,22 @@
+"""命令行入口
+
+提供基础运行模式：回测/实时，当前支持债券资产的数据获取与海龟策略信号演示。
+"""
+
 import argparse
 import pandas as pd
 from app.bond.bond_data import BondData
 from app.turtle_algo.turtle_strategy import TurtleStrategy
 
 def main():
+    """命令行主函数
+
+    参数（通过 CLI 传入）
+    - asset: 资产类型（bond/stock/etf）
+    - symbol: 资产代码
+    - mode: 运行模式（backtest/live）
+    - equity: 初始权益
+    """
     parser = argparse.ArgumentParser(description="Turtle Trading System")
     parser.add_argument("--asset", type=str, default="bond", choices=["bond", "stock", "etf"], help="资产类型")
     parser.add_argument("--symbol", type=str, required=True, help="资产代码")

@@ -1,9 +1,19 @@
+"""文本数据存储
+
+使用 SQLite 轻量持久化抓取到的公告与新闻文本，支持简单的关键字检索。
+"""
+
 import sqlite3
 from pathlib import Path
 from typing import List, Dict, Optional
 import time
 
 class TextStorage:
+    """文本存储接口
+
+    参数
+    - db_path: SQLite 数据库路径，默认 `data/text.db`
+    """
     def __init__(self, db_path: Optional[Path] = None):
         if db_path is None:
             db_path = Path(__file__).resolve().parents[2] / 'data' / 'text.db'
@@ -12,6 +22,7 @@ class TextStorage:
         self._init()
 
     def _init(self):
+        """初始化数据库结构"""
         con = sqlite3.connect(self.db_path)
         cur = con.cursor()
         cur.execute(
@@ -21,6 +32,11 @@ class TextStorage:
         con.close()
 
     def save_documents(self, docs: List[Dict]):
+        """批量保存文档
+
+        参数
+        - docs: 字典列表，包含 `source, url, title, published_at, content`
+        """
         con = sqlite3.connect(self.db_path)
         cur = con.cursor()
         now = int(time.time())
@@ -33,6 +49,15 @@ class TextStorage:
         con.close()
 
     def query(self, keyword: str, limit: int = 50) -> List[Dict]:
+        """关键词查询
+
+        参数
+        - keyword: 关键词（LIKE 模糊匹配）
+        - limit: 返回条数上限
+
+        返回
+        - List[Dict]：包含 `source, url, title, published_at` 的简要信息
+        """
         con = sqlite3.connect(self.db_path)
         cur = con.cursor()
         cur.execute('SELECT source, url, title, published_at FROM documents WHERE content LIKE ? ORDER BY id DESC LIMIT ?', (f'%{keyword}%', limit))

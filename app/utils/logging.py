@@ -1,8 +1,21 @@
+"""日志工具
+
+提供统一的应用级日志记录器，带滚动文件与控制台输出。
+"""
+
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path
 
 def get_logger(name: str) -> logging.Logger:
+    """获取命名日志记录器
+
+    参数
+    - name: 日志记录器名称
+
+    返回
+    - logging.Logger：已配置的记录器（INFO 级别，滚动文件与控制台双渠道）
+    """
     logger = logging.getLogger(name)
     if logger.handlers:
         return logger

@@ -1,9 +1,23 @@
+"""备份与回滚原型
+
+支持对指定目录/文件进行打包归档（zip）并生成 `manifest.json`，提供解压恢复到目标目录的能力。
+"""
+
 import json
 from pathlib import Path
 import time
 import zipfile
 
 def create_backup(paths, out_dir=None):
+    """创建备份归档
+
+    参数
+    - paths: 待备份的目录/文件列表
+    - out_dir: 备份输出目录，默认项目根下 `backups/`
+
+    返回
+    - str：生成的 zip 文件路径
+    """
     if out_dir is None:
         out_dir = Path(__file__).resolve().parents[2] / 'backups'
     out_dir = Path(out_dir)
@@ -26,6 +40,15 @@ def create_backup(paths, out_dir=None):
     return str(archive)
 
 def restore_backup(archive_path, target_dir=None):
+    """从备份归档恢复文件
+
+    参数
+    - archive_path: zip 归档路径
+    - target_dir: 解压目标目录，默认项目根
+
+    返回
+    - str：恢复后的目标目录路径
+    """
     if target_dir is None:
         target_dir = Path(__file__).resolve().parents[2]
     target_dir = Path(target_dir)

@@ -1,9 +1,27 @@
+"""海龟交易策略（面向对象实现）
+
+提供指标计算与信号生成，支持两种模式参数（Mode 1/Mode 2），包含加仓与移动止损逻辑。
+"""
+
 import pandas as pd
 import numpy as np
 import pandas_ta as ta  # 使用 pandas-ta 作为 ta-lib 的纯 Python 替代
 
 class TurtleStrategy:
-    """海龟交易策略的面向对象实现"""
+    """海龟交易策略的面向对象实现
+
+    参数
+    - entry_length: 系统1进场长度
+    - exit_length: 系统1出场长度
+    - atr_period: ATR周期
+    - risk_per_trade: 每笔交易风险比例（相对权益）
+    - initial_stop_atr_multiple: 初始止损的 ATR 倍数
+    - pyramid_atr_multiple: 金字塔加仓的 ATR 间隔倍数
+    - max_units: 最大头寸单位数
+    - mode: 'Mode 1' 或 'Mode 2'
+    - entry_length_mode2: 系统2进场长度
+    - exit_length_mode2: 系统2出场长度
+    """
 
     def __init__(self, entry_length=20, exit_length=10, atr_period=14, risk_per_trade=0.02,
                  initial_stop_atr_multiple=2, pyramid_atr_multiple=0.5, max_units=4,
@@ -45,10 +63,13 @@ class TurtleStrategy:
         self.avg_price = np.nan
 
     def compute_indicators(self, data: pd.DataFrame) -> pd.DataFrame:
-        """
-        计算策略所需指标
-        :param data: DataFrame with 'high', 'low', 'close' columns
-        :return: DataFrame with added indicators
+        """计算策略所需指标
+
+        参数
+        - data: 包含 `high, low, close` 列的行情数据
+
+        返回
+        - DataFrame：新增 ATR、进出场参考价列
         """
         df = data.copy()
 
@@ -70,11 +91,14 @@ class TurtleStrategy:
         return df
 
     def generate_signals(self, df: pd.DataFrame, equity: float) -> pd.DataFrame:
-        """
-        生成交易信号
-        :param df: DataFrame with indicators
-        :param equity: 当前权益
-        :return: DataFrame with signals ('signal': 'long', 'short', 'exit', 'add', 'stop')
+        """生成交易信号
+
+        参数
+        - df: 指标数据帧（需包含 ATR 与进出场参考价）
+        - equity: 当前账户权益（用于单位大小计算）
+
+        返回
+        - DataFrame：`signal` 列包含 'long'/'short'/'exit'/'add_long'/'add_short'/'stop_long'/'stop_short'
         """
         df['signal'] = None
 
@@ -159,7 +183,10 @@ class TurtleStrategy:
         return df
 
     def _reset_state(self):
-        """重置内部状态"""
+        """重置内部状态
+
+        清空持仓/单位与止损参数，用于退出或止损后归位。
+        """
         self.units = 0
         self.position = 0
         self.trailing_stop_long = np.nan
